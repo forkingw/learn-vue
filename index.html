@@ -1,55 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="./vue.js"></script>
 </head>
+
 <body>
     <div id="app">
-        <img :src="imageSrc" alt="">
-        <button v-bind:[key]="value"></button>
-        <div v-bind="{id: 'demo', class: 'red', 'data-me': 1}"></div>
-        <div v-bind:class="{red: isred}"></div>
-        <div v-bind:class="[classA, classB]"></div>
-        <div v-bind:class="[isActice ? classA : classB]"></div>
-        <div v-bind:class="[classA, {classB: isActice}]"></div>
-        <div v-bind:class="classA" class="red"></div>
-        <div v-bind:style="{fontSize: size + 'px'}">fontSize: {{ size }}</div>
-        <div v-bind:style="styleObject">fontSize: {{ styleObject }}</div>
-        <div :style="[styleObject, styleObject2]">object</div>
-        <div :style="[styleObjectB]">styleObjectB</div>
-        <div :style="{display: ['-webkit-box', '-ms-flexbox', 'flex']}"></div>
-        <svg :view-box.camel="viewBox"></svg>
-        <div :text-content.prop="text"></div>
+        <div @click.capture="alert('div')" :style="{backgroundColor: 'red'}">
+            <button @click.stop="alert('button')">click</button>
+        </div>
+
+        <form @submit.prevent="onSumbit">
+            <input type="submit" value="sumbit">
+        </form>
+
+        <a href="www.baidu.com" @click.prevent>baidu</a>
     </div>
 
     <script>
         const vm = new Vue({
             el: '#app',
             data: {
-                imageSrc: "https://cdn.pixabay.com/photo/2020/04/18/17/17/fantasy-5060076_960_720.jpg",
-                key: "lucky",
-                value: "wang",
-                isred: true,
-                classA: "a",
-                classB: "b",
-                isActice: false,
-                size: 16,
-                styleObject: {
-                    fontSize: '13px'
+                counter: 0
+            },
+            methods: {
+                alert(str) {
+                    alert(str)
                 },
-                styleObject2: {
-                    color: 'yellow'
-                },
-                styleObjectB: {
-                    transform: 'translate(2px)'
-                },
-                viewBox: "0 0 100 100",
-                text: "wula"
+                onSumbit() {
+                    alert("aaaa")
+                }
             }
         });
     </script>
 </body>
+
 </html>
