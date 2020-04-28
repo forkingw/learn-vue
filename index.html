@@ -10,30 +10,23 @@
 
 <body>
     <div id="app">
-        <div @click.capture="alert('div')" :style="{backgroundColor: 'red'}">
-            <button @click.stop="alert('button')">click</button>
-        </div>
-
-        <form @submit.prevent="onSumbit">
-            <input type="submit" value="sumbit">
-        </form>
-
-        <a href="www.baidu.com" @click.prevent>baidu</a>
+       <ul>
+           <li v-for="(person, index) in persons">
+               {{ person }} -- {{ index }}
+           </li>
+       </ul>
     </div>
 
     <script>
         const vm = new Vue({
             el: '#app',
             data: {
-                counter: 0
-            },
-            methods: {
-                alert(str) {
-                    alert(str)
-                },
-                onSumbit() {
-                    alert("aaaa")
-                }
+                persons: [
+                    {name: "Ema", age: 20},
+                    {name: "Mike", age: 21},
+                    {name: "Jane", age: 22},
+                    {name: "father", age: 23},
+                ]
             }
         });
     </script>
