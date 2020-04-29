@@ -10,23 +10,23 @@
 
 <body>
     <div id="app">
-       <ul>
-           <li v-for="(person, index) in persons">
-               {{ person }} -- {{ index }}
-           </li>
-       </ul>
+        <input type="checkbox" value="cheng" id="cheng" v-model="checkList">
+        <label for="cheng">cheng</label>
+
+        <input type="checkbox" value="deng" id="deng" v-model="checkList">
+        <label for="deng">deng</label>
+
+        <input type="radio" value="sitong" id="sitong" v-model="picker">
+        <label for="sitong">sitong</label>
     </div>
 
     <script>
         const vm = new Vue({
             el: '#app',
             data: {
-                persons: [
-                    {name: "Ema", age: 20},
-                    {name: "Mike", age: 21},
-                    {name: "Jane", age: 22},
-                    {name: "father", age: 23},
-                ]
+                checked: true,
+                checkList: [],
+                picker: ''
             }
         });
     </script>
