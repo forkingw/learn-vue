@@ -1,0 +1,47 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-size: 13px;
+}
+#app {
+    width: 80%;
+    min-width: 500px;
+    margin: 60px auto;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+}
+ul {
+    list-style: none;
+}
+ul li {
+    margin-bottom: 8px;
+}
+.title {
+    color: silver;
+    margin-right: 10px;
+}
+.typeList {
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.typeList span {
+    color: steelblue;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+span.active {
+    color: #fff;
+    background-color: #f40;
+}
+.screen {
+    display: inline-block;
+}
+.seleted {
+    color: thistle;
+}
+.right {
+    margin-right: 20px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
