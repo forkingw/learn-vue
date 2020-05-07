@@ -11,74 +11,83 @@
 
 <body>
     <div id="app">
-        <ul>
-            <li v-for="item in goodsList">
-                <span class="title">{{ item.title }}:</span>
-                <div class="typeList">
-                    <span v-for="(type, i) in item.typeList"
-                          :class="{'active': i == item.active}"
-                          @click="seleteCondition(item.id, i)">{{ type }}</span>
+        <div class="header">
+            <div class="container">
+                <div class="logo">toDoList</div>
+                <div class="input-area">
+                    <input type="text" @input="handleInput" :value="curMask">
+                    <button @click="addMask">添加</button>
                 </div>
-            </li>
-        </ul>
-        <div>已选条件：
-            <span class="seleted" v-if="!flag">暂时没有选择过滤条件</span>
-
-            <template v-if="flag">
-                <div v-for="condition in goodsList" class="screen">
-                    <span v-if="condition.active !== 0" class="active right">
-                        {{ condition.typeList[condition.active] }} 
-                        <span class="close" @click="close(condition.id)">X</span>
-                    </span>
-                </div>
-            </template>
+            </div>
+        </div>
+        <div class="container">
+            <h2>
+                <span>正在进行</span>
+                <span class="mask-num">{{ needDoList.length }}</span>
+            </h2>
+            <ul class="mask-list">
+                <li v-for="(mask, index) in needDoList"
+                    :key="mask.id">
+                    <div>
+                        <input type="checkbox" @change="doCheck(index, 'need')">
+                        <span>{{ mask.title }}</span>
+                    </div>
+                    <button @click="deleteMask(index, 'need')">删除</button>
+                </li>
+            </ul>
+        </div>
+        <div class="container">
+            <h2>
+                <span>已经完成</span>
+                <span class="mask-num">{{ completeList.length }}</span>
+            </h2>
+            <ul class="mask-list complete-list">
+                <li v-for="(mask, index) in completeList"
+                    :key="mask.id">
+                    <div>
+                        <input type="checkbox" @change="doCheck(index, 'complete')">
+                        <span>{{ mask.title }}</span>
+                    </div>
+                    <button @click="deleteMask(index, 'complete')">删除</button>
+                </li>
+            </ul>
         </div>
     </div>
 
     <script>
         const vm = new Vue({
             el: '#app',
-            data: {
-                goodsList: [{
-                        title: '上装',
-                        typeList: ['全部', '针织衫', '毛呢外套', 'T恤', '羽绒服', '棉衣', '卫衣', '风衣'],
-                        id: 1,
-                        active: 0
-                    },
-                    {
-                        title: '裤装',
-                        typeList: ['全部', '牛仔裤', '小脚/铅笔裤', '休闲裤', '打底裤', '哈伦裤'],
-                        id: 2,
-                        active: 0
-                    },
-                    {
-                        title: '裙装',
-                        typeList: ['全部', '连衣裙', '半身裙', '长袖连衣裙', '中长款连衣裙'],
-                        id: 3,
-                        active: 0
-                    }
-                ],
-                flag: false
+            data: {    
+                curMask: '',
+                needDoList: [],
+                completeList: []
             },
             methods: {
-                seleteCondition(id, index) {
-                    this.goodsList.forEach(ele => {
-                        if (ele.id === id) {
-                            ele.active = index;
-                        }
-                    });
-                    this.isShow();
+                handleInput(e) {
+                    this.curMask = e.target.value;
                 },
-                isShow() {
-                    this.flag = this.goodsList.some(goods => goods.active !== 0);
-                    console.log(this.flag);
-                },
-                close(id) {
-                    this.goodsList.forEach(good => {
-                        if (good.id === id) {
-                            good.active = 0;
-                        }
+                addMask() {
+                    if (this.curMask === "") {
+                        return;
+                    }
+                    this.needDoList.push({
+                        title: this.curMask,
+                        id: Math.random()
                     });
+                    this.curMask = "";
+                },
+                doCheck(index, type) {
+                    if(type === "need"){
+                        const completeMask = this.needDoList.splice(index, 1);
+                        this.completeList.push(...completeMask);
+                    } else {
+                        const nocompleteMask = this.completeList.splice(index, 1);
+                        this.needDoList.push(...nocompleteMask);
+                    }
+                },
+                deleteMask(index, type) {
+                    const todolist = type === "need" ? this.needDoList : this.completeList;
+                    todolist.splice(index, 1);
                 }
             }
         });
