@@ -10,23 +10,26 @@
 
 <body>
     <div id="app">
-        <input type="checkbox" value="cheng" id="cheng" v-model="checkList">
-        <label for="cheng">cheng</label>
+       {{ msg.split('').reverse().join('') }}
 
-        <input type="checkbox" value="deng" id="deng" v-model="checkList">
-        <label for="deng">deng</label>
-
-        <input type="radio" value="sitong" id="sitong" v-model="picker">
-        <label for="sitong">sitong</label>
+       {{ someComputed }}
+       <br />
+       {{ msgReverse }}
     </div>
 
     <script>
         const vm = new Vue({
             el: '#app',
             data: {
-                checked: true,
-                checkList: [],
-                picker: ''
+               msg: 'heoll, 你好呀，我是你爸爸'
+            },
+            computed: {
+                someComputed: function () {
+                    return "xxxx";
+                },
+                msgReverse: function() {
+                    return this.msg.split('').reverse().join('');
+                }
             }
         });
     </script>
