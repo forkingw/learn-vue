@@ -1,25 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>仿百度搜索联想</title>
     <link rel="stylesheet" href="index.css">
-    <script src="./vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
-
 <body>
     <div id="app">
-      
+        <div class="logo">
+            <img src="https://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png" alt="">
+        </div>
+        <div class="search-box">
+            <span class="search-area">
+                <input
+                    type="text"
+                    max-length="100"
+                    v-model.trim="inputValue"
+                    @focus="inputFocus = true"
+                    @blur="inputFocus = false">
+                <span class="icon"></span>
+            </span>
+            <span class="search-btn">百度一下</span>
+        </div>
+
+        <ul class="search-list" v-show="inputFocus && dataList.length">
+            <li
+                v-for="s in dataList">
+                {{ s }}
+            </li>
+        </ul>
     </div>
+
     <script>
-        // template 是模板会替换掉 el 选中的元素
         const vm = new Vue({
-            el: '#app',
-            template: `<div id="app10">I'm option of template.</div>`        
+            el: "#app",
+            data: {
+                inputFocus: false,
+                inputValue: "",
+                dataList: []
+            },
+            methods: {
+                searchRes(res) {
+                  this.dataList = res.s 
+                }
+            },
+            watch: {
+                inputValue(val) {
+                    $.ajax({
+                        url: 'https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su',
+                        dataType: 'jsonp',
+                        data: {
+                            wd: val,
+                            cb: 'vm.searchRes'
+                        }
+                    })
+                }
+            }
         });
     </script>
 </body>
-
 </html>
