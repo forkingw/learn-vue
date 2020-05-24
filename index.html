@@ -4,10 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>vue-resource 的使用</title>
+    <title>axios的使用</title>
     <link rel="stylesheet" href="index.css">
+
+    <!-- 注意: axios 在 vue 前面引入也是可以的,因为他并没有依赖 vue -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
 </head>
 
 <body>
@@ -21,6 +24,7 @@
         <div class="upload-btn" @click="handleUpload">上传</div>
         <div class="test-btn" @click="handleTest">测试jsonp</div>
         <div class="show-btn" @click="handleShow">显示人物信息</div>
+        <div class="show-btn" @click="cancleRequest">取消</div>
         <ul class="person-list" v-if="personList.length">
             <li class="person" v-for="person in personList">
                 <span>{{ person.name }}</span>
@@ -30,6 +34,62 @@
     </div>
 
     <script>
+        /* axios({
+            method: 'get', // post、get、put....
+            baseURL: '', // 请求的域名，基本地址
+            url: '', // 请求的路径
+            params: {}, // 会将请求参数拼接在url上
+            data: {}, // 会将请求参数放在请求体中
+            headers: {}, // 设置请求头，例如设置token等
+            timeout: 1000, // 设置请求超时时长，单位：ms
+        }) */
+
+        axios.defaults.baseURL = 'https://developer.duyiedu.com/vue'
+        axios.defaults.timeout = 1000
+
+        const getInstance = axios.create({
+            baseURL: "https://developer.duyiedu.com/vue",
+            timeout: 1000
+        })
+
+        // 请求拦截器
+        axios.interceptors.request.use(config => {
+            config.method = "post"
+            return config   // 一定要记得 return，否则 请求无法发出。
+        })
+
+        // 响应拦截器
+        axios.interceptors.response.use(response => {
+            if (response.status === 200) {
+                return response.data;
+            }
+            return response
+        }, error => {
+            console.log(error);
+        })
+
+        // 移除拦截器
+        const myInterceptor = axios.interceptors.request.use(config => {
+            config.method = "post"
+            return config // 一定要记得 return，否则 请求无法发出。
+        })
+        axios.interceptors.request.eject(myInterceptor);
+
+        // 取消请求
+        const CancelToken = axios.CancelToken;
+        const source = CancelToken.source();
+
+        // 取消单独的 请求，在 vue 中不好使
+        // let cancel = null;
+
+        // axios.get("/getUserInfo", {
+        //     cancelToken: new CancelToken(function executor(c) {
+        //         cancel = c;
+        //     })
+        // })
+
+        // cancel();
+
         const vm = new Vue({
             el: "#app",
             data: {
@@ -40,33 +100,107 @@
             },
             methods: {
                 handleShow() {
-                    this.$http.get("https://developer.duyiedu.com/vue/getUserInfo")
+                    // axios({
+                    //     method: "get",
+                    //     baseURL: "https://developer.duyiedu.com/vue",
+                    //     url: "/getUserInfo"
+                    // }).then(res => {
+                    //     this.msg = res.data.msg;
+                    //     this.personList = res.data.data.slice(0, 10);
+                    // })
+
+                    // 注意： 当使用 axios(url, [config]) 这种形式时，url 必须写完整(baseURL + url),不能分开。
+                    /* axios("https://developer.duyiedu.com/vue/getUserInfo", {
+                        method: 'get'
+                    }).then(res => {
+                        this.msg = res.data.msg;
+                        this.personList = res.data.data.slice(0, 10);
+                    }) */
+
+                    // axios.get("https://developer.duyiedu.com/vue/getUserInfo")
+                    //     .then(res => {
+                    //         this.msg = res.data.msg;
+                    //         this.personList = res.data.data.slice(0, 10);
+                    //     })
+
+                    // axios.get("/getUserInfo")
+                    //     .then(res => {
+                    //         this.msg = res.data.msg;
+                    //         this.personList = res.data.data.slice(0, 10);
+                    //     })
+
+                    // axios.get("/getUserInfo")
+                    //     .then(res => {
+                    //         console.log(res)
+                    //     })
+
+                    // axios.get("/getUserInfo", {
+                    //     cancelToken: source.token
+                    // })
+                    // .then(res => {
+                    //     console.log(res)
+                    // })
+                    // .catch(err => {
+                    //     console.log(err)
+                    // })
+
+                    // axios.get("/getUserInfo", {
+                    //         cancelToken: source.token
+                    //     })
+                    //     .then(res => {
+                    //         console.log(res)
+                    //     })
+                    //     .catch(err => {
+                    //         console.log(err)
+                    //     })
+
+                    axios.get("/getUserInfo")
                         .then(res => {
-                            return res.json()
+                            console.log(res)
                         })
-                        .then(res => this.personList = res.data.slice(0, 9))
                         .catch(error => {
-                            console.log(error);
+                            // console.log(error.response)
+                            // console.log(error.request)
+                            // if (error.response) {
+                            //     console.log("响应时错误")
+                            // } else if (error.request) {
+                            //     console.log("请求时错误")
+                            // } else {
+                            //     console.log("其他错误");
+                            // }
                         })
                 },
                 handleTest() {
-                    this.$http.jsonp('https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su', {
-                            params: {
-                                wd: 'heihie'
-                            },
-                            jsonp: 'cb'
-                        })
-                        .then(res => console.log(res));
+
                 },
                 handleUpload() {
-                    this.$http.post("https://developer.duyiedu.com/vue/setUserInfo", {
-                        name: this.name,
-                        mail: this.mail
+                    const {
+                        name,
+                        mail
+                    } = this;
+                    // axios.post("https://developer.duyiedu.com/vue/setUserInfo", {
+                    //     name,
+                    //     mail
+                    // }).then(res => {
+                    //     this.msg = res.data.msg;
+                    // })
+
+                    getInstance.post('/setUserInfo', {
+                        name,
+                        mail
                     }).then(res => {
-                        this.msg = res.body.msg;
-                    }).catch(error => {
-                        this.msg = error.body.msg;
+                        this.msg = res.data.msg
                     })
+
+                    // axios.all([
+                    //     axios.get("/getUserInfo"),
+                    //     axios.post("/setUserInfo", {name: "axios.all", mail: "mail@cc.com"})
+                    // ]).then(axios.spread((ares, bres) => {
+                    //     console.log(ares, bres)
+                    // }))
+                },
+                cancleRequest() {
+                    source.cancel("取消请求");
                 }
             },
             watch: {
