@@ -11,13 +11,48 @@
 
 <body>
     <div id="app">
-      
+      {{ msg }}
     </div>
     <script>
         // template 是模板会替换掉 el 选中的元素
         const vm = new Vue({
             el: '#app',
-            template: `<div id="app10">I'm option of template.</div>`        
+            data: {
+                msg: "hehe"
+            },
+            watch: {
+                msg: {
+                    handler() {
+                        console.log("侦听到 msg 的值");
+                    },
+                    immediate: true
+                }
+            },
+            beforeCreate() {
+                console.log("---beforeCreate---");
+            },
+            created() {
+                console.log("---created---");
+            },
+            beforeMount() {
+                console.log("---beforeMount---");
+            },
+            mounted() {
+                console.log("---mounted---");
+            },
+            beforeUpdate() { // 只有在页面中使用过的值改变才能过 出发数据更新的钩子函数
+                console.log(this.$el.outerHTML);
+                console.log("---beforeUpdate---");
+            },
+            updated() {
+                console.log("---update---");
+            },
+            beforeDestroy() { 
+                console.log("---beforeDestory---");
+            },
+            destroyed() {
+                console.log("---destory---");
+            }    
         });
     </script>
 </body>
