@@ -99,37 +99,51 @@
       </div>
     </div>
     <!-- 导航区域 -->
-    <div
-      :class="{
+    <div :class="{
         'nav-box': navIndex === 1,
         'nav-box-hide': navIndex === 2,
         'hide': navIndex === 2 && navHide
-      }"
-      v-for="navIndex in 2">
+      }" v-for="navIndex in 2">
       <ul class="nav-list">
-        <li
-          class="nav"
-          :class="{
+        <li class="nav" :class="{
             big: nav.title.length === 3 && navIndex === 2,
             active: index === activeIndex
-          }"
-          v-for="(nav, index) in navList"
-          :key="nav.id"
-          @click="handleNavClick(index)"
-          >{{ nav.title }}</li>
+          }" v-for="(nav, index) in navList" :key="nav.id" @click="handleNavClick(index)">{{ nav.title }}</li>
       </ul>
-      <div
-        class="down"
-        v-if="navIndex === 1"
-        @click="handleClick">
-        <svg width="16" height="32" viewBox="0 0 1024 1024"><path d="M515.2 649.6L169.6 304c-12.8-12.8-32-12.8-44.8 0s-12.8 35.2 0 48l368 364.8c12.8 12.8 32 12.8 44.8 0l361.6-361.6c12.8-12.8 12.8-35.2 0-48s-32-12.8-44.8 0L515.2 649.6z" fill="#ccc"></path></svg>
+      <div class="down" v-if="navIndex === 1" @click="handleClick">
+        <svg width="16" height="32" viewBox="0 0 1024 1024">
+          <path
+            d="M515.2 649.6L169.6 304c-12.8-12.8-32-12.8-44.8 0s-12.8 35.2 0 48l368 364.8c12.8 12.8 32 12.8 44.8 0l361.6-361.6c12.8-12.8 12.8-35.2 0-48s-32-12.8-44.8 0L515.2 649.6z"
+            fill="#ccc"></path>
+        </svg>
       </div>
-      <div
-        class="up"
-        v-else
-        @click="handleClick">
-        <svg width="16" height="32" viewBox="0 0 1024 1024"><path d="M854.4 713.6c12.8 12.8 32 12.8 44.8 0s12.8-35.2 0-48L537.6 304c-12.8-12.8-32-12.8-44.8 0L124.8 672c-12.8 12.8-12.8 35.2 0 48s32 12.8 44.8 0l345.6-342.4 339.2 336z" fill="#ccc"></path></svg>
+      <div class="up" v-else @click="handleClick">
+        <svg width="16" height="32" viewBox="0 0 1024 1024">
+          <path
+            d="M854.4 713.6c12.8 12.8 32 12.8 44.8 0s12.8-35.2 0-48L537.6 304c-12.8-12.8-32-12.8-44.8 0L124.8 672c-12.8 12.8-12.8 35.2 0 48s32 12.8 44.8 0l345.6-342.4 339.2 336z"
+            fill="#ccc"></path>
+        </svg>
       </div>
+    </div>
+    <!-- 轮播图区域 -->
+    <div class="banner-box">
+      <ul
+        class="banner-list"
+        :style="bannerStyle"
+        @transitionend="handleTranstionEnd">
+        <li class="banner" v-for="banner in bannerList" :key="banner.id">
+          <img class="poster" :src="banner.poster" :alt="banner.title">
+        </li>
+      </ul>
+      <ul class="banner-index" v-if="bannerList.length">
+        <li
+        v-for="index in bannerList.length - 1"
+          class="index"
+          :class="{
+            'active': index - 1 === bannerActiveIndex % 3
+          }">
+        </li>
+      </ul>
     </div>
   </div>
 
@@ -139,7 +153,14 @@
       data: {
         navList: [],
         activeIndex: 0,
-        navHide: true
+        navHide: true,
+        bannerList: [],
+        bannerWidth: 350,
+        bannerActiveIndex: 0,
+        bannerStyle: {
+          left: 0,
+          transition: 'left .8s'
+        }
       },
       methods: {
         handleClick() {
@@ -147,16 +168,43 @@
         },
         handleNavClick(index) {
           this.activeIndex = index
+        },
+        autoMove() {
+          setTimeout(() => {
+            if (this.bannerActiveIndex == 0) {
+              this.bannerStyle.transition = 'left .8s';                     
+            }
+            this.bannerActiveIndex ++;
+            this.bannerStyle.left = -this.bannerWidth * this.bannerActiveIndex + 'px';
+          }, 1000)
+        },
+        handleTranstionEnd() {
+          if (this.bannerActiveIndex == this.bannerList.length - 1) {
+            this.bannerActiveIndex = 0;
+            this.bannerStyle.left = 0;
+            this.bannerStyle.transition = 'none';       
+          }
+          this.autoMove();
         }
       },
       created() {
         axios.get('https://developer.duyiedu.com/vue/bz/nav')
           .then(res => {
-            console.log(res);
             if (res.status === 200) {
               this.navList = res.data.data;
             }
           })
+        axios.get('https://developer.duyiedu.com/vue/bz/banner')
+          .then(res => {
+            if (res.status === 200) {
+              const lastEl = {...res.data.data[0]};
+              lastEl.id = Math.floor(Math.random() * 100000000);
+              this.bannerList = [...res.data.data, lastEl];
+            }
+          })
+      },
+      mounted() {
+        this.autoMove();
       }
     })
   </script>

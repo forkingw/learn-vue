@@ -118,3 +118,52 @@
 .nav-box-hide .up {
     text-align: center;
 }
+.banner-box {
+    position: relative;
+    top: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 350px;
+    height: 110px;
+    overflow-x: hidden;
+    border-radius: 4px;
+}
+.banner-box .banner-list {
+    position: absolute;
+    width: calc(350px * 4);
+    transition: left .8s;
+}
+.banner-box .banner-list .banner {
+    display: inline-block;
+    width: 350px;
+    height: 110px;
+}
+.banner-box .banner-list .banner .poster {
+    width: 100%;
+    height: 100%;
+}
+
+.banner-box .banner-index {
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding-left: 3px;
+    padding-right: 3px;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, .5);
+    display: flex;
+    align-items: center;
+    height: 10px;
+}
+.banner-box .banner-index .index {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #fff;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+.banner-box .index.active {
+    background-color: #fb7299;
+}
