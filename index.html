@@ -15,7 +15,7 @@
 </head>
 
 <body>
-  <div id="app">
+  <div id="app" @scroll="handleScroll">
     <div class="header">
       <div class="logo">
         <svg width="64" height="28" viewBox="0 0 62 28" fill="#de698c">
@@ -126,22 +126,50 @@
       </div>
     </div>
     <!-- 轮播图区域 -->
-    <div class="banner-box">
-      <ul
-        class="banner-list"
-        :style="bannerStyle"
-        @transitionend="handleTranstionEnd">
+    <div class="banner-box" v-if="bannerList.length">
+      <ul class="banner-list" :style="bannerStyle" @transitionend="handleTranstionEnd">
         <li class="banner" v-for="banner in bannerList" :key="banner.id">
           <img class="poster" :src="banner.poster" :alt="banner.title">
         </li>
       </ul>
-      <ul class="banner-index" v-if="bannerList.length">
-        <li
-        v-for="index in bannerList.length - 1"
-          class="index"
-          :class="{
+      <ul class="banner-index">
+        <li v-for="index in bannerList.length - 1" class="index" :class="{
             'active': index - 1 === bannerActiveIndex % 3
           }">
+        </li>
+      </ul>
+    </div>
+
+    <!-- 视频列表区域 -->
+    <div class="video-box">
+      <ul class="video-list">
+        <li v-for="video in videoList" :key="video.id" class="video">
+          <div class="poster">
+            <img :src="video.poster" :alt="video.title">
+            <div class="info">
+              <div class="play">
+                <svg id="icon-bofangshu" viewBox="0 0 1024 1024">
+                  <path
+                    d="M800 128H224C134.4 128 64 198.4 64 288v448c0 89.6 70.4 160 160 160h576c89.6 0 160-70.4 160-160V288c0-89.6-70.4-160-160-160z m96 608c0 54.4-41.6 96-96 96H224c-54.4 0-96-41.6-96-96V288c0-54.4 41.6-96 96-96h576c54.4 0 96 41.6 96 96v448z">
+                  </path>
+                  <path
+                    d="M684.8 483.2l-256-112c-22.4-9.6-44.8 6.4-44.8 28.8v224c0 22.4 22.4 38.4 44.8 28.8l256-112c25.6-9.6 25.6-48 0-57.6z">
+                  </path>
+                </svg>
+                {{ video.play }}
+              </div>
+              <div class="rank" v-if="video.rank">
+                <svg viewBox="0 0 1024 1024">
+                  <path
+                    d="M800 128H224C134.4 128 64 198.4 64 288v448c0 89.6 70.4 160 160 160h576c89.6 0 160-70.4 160-160V288c0-89.6-70.4-160-160-160z m96 608c0 54.4-41.6 96-96 96H224c-54.4 0-96-41.6-96-96V288c0-54.4 41.6-96 96-96h576c54.4 0 96 41.6 96 96v448z">
+                  </path>
+                  <path d="M240 384h64v64h-64zM368 384h384v64h-384zM432 576h352v64h-352zM304 576h64v64h-64z"></path>
+                </svg>
+                {{ video.rank }}
+              </div>
+            </div>
+          </div>
+          <div class="desc"> {{ video.title }}</div>
         </li>
       </ul>
     </div>
@@ -160,7 +188,10 @@
         bannerStyle: {
           left: 0,
           transition: 'left .8s'
-        }
+        },
+        oldVideList: [],
+        videoGettingData: false,
+        videoCount: 0
       },
       methods: {
         handleClick() {
@@ -172,9 +203,9 @@
         autoMove() {
           setTimeout(() => {
             if (this.bannerActiveIndex == 0) {
-              this.bannerStyle.transition = 'left .8s';                     
+              this.bannerStyle.transition = 'left .8s';
             }
-            this.bannerActiveIndex ++;
+            this.bannerActiveIndex++;
             this.bannerStyle.left = -this.bannerWidth * this.bannerActiveIndex + 'px';
           }, 1000)
         },
@@ -182,9 +213,46 @@
           if (this.bannerActiveIndex == this.bannerList.length - 1) {
             this.bannerActiveIndex = 0;
             this.bannerStyle.left = 0;
-            this.bannerStyle.transition = 'none';       
+            this.bannerStyle.transition = 'none';
           }
           this.autoMove();
+        },
+        handleScroll(e) {
+          const {
+            scrollHeight,
+            offsetHeight,
+            scrollTop
+          } = e.target;
+          const toBottomHeight = scrollHeight - offsetHeight - scrollTop;
+
+          if (this.videoList.length == this.videoCount) {
+            return;            
+          }
+
+          if (toBottomHeight < 200 && !this.videoGettingData) {
+            this.videoGettingData = true;
+            console.log("get")
+            axios.get('https://developer.duyiedu.com/vue/bz/video', {
+              params: {
+                start: this.videoList.length,
+                offset: 12
+              }
+            }).then(res => {
+              if (res.status === 200) {
+                this.oldVideList.push(...res.data.data);
+                this.videoGettingData = false;
+              }
+            })
+          }
+        }
+      },
+      computed: {
+        videoList() {
+          return this.oldVideList.map(video => {
+            video.play = video.play > 10000 ? video.play / 10000 + '万' : video.play;
+            video.rank = video.rank > 10000 ? video.rank / 10000 + '万' : video.rank;
+            return video;
+          })
         }
       },
       created() {
@@ -197,11 +265,24 @@
         axios.get('https://developer.duyiedu.com/vue/bz/banner')
           .then(res => {
             if (res.status === 200) {
-              const lastEl = {...res.data.data[0]};
+              const lastEl = {
+                ...res.data.data[0]
+              };
               lastEl.id = Math.floor(Math.random() * 100000000);
               this.bannerList = [...res.data.data, lastEl];
             }
           })
+        axios.get('https://developer.duyiedu.com/vue/bz/video', {
+          params: {
+            start: 0,
+            offset: 12
+          }
+        }).then(res => {
+          if (res.status === 200) {
+            this.oldVideList = res.data.data;
+            this.videoCount = res.data.count;
+          }
+        })
       },
       mounted() {
         this.autoMove();

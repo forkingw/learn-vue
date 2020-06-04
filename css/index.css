@@ -1,3 +1,10 @@
+body, html {
+    height: 100%;
+}
+#app {
+    height: 100%;
+    overflow-y: scroll;
+}
 .header {
     position: fixed;
     top: 0;
@@ -55,6 +62,7 @@
     left: 0;
     right: 0;
     z-index: 1;
+    background-color: #fff;
 }
 .nav-box .nav-list {
     white-space: nowrap;
@@ -166,4 +174,67 @@
 }
 .banner-box .index.active {
     background-color: #fb7299;
+}
+
+.video-box {
+    padding-top: 95px;
+    padding-left: 6px;
+    padding-right: 6px;
+}
+.video-box .video-list::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+.video-box .video-list .video {
+    width: 50%;
+    float: left;
+}
+.video-box .video-list .video .poster {
+    position: relative;
+    margin-left: 6px;
+    margin-right: 6px;
+    height: 106px;
+}
+.video-box .video-list .video .poster img {
+    width: 100%;
+    height: 100%;
+}
+.video-box .video-list .info {
+    position: absolute;
+    display: flex;
+    justify-content: space-between;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color: #fff;
+    font-size: 12px;
+    height: 20px;
+    padding-top: 7px;
+    padding-bottom: 3px;
+    padding-left: 10px;
+    background-image: linear-gradient(rgba(33, 33, 33, 0), rgba(33, 33, 33, .5));
+}
+.video-box .video-list .info div {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 10px;
+}
+.video-box .video-list svg {
+    width: 14px;
+    height: 14px;
+    fill: #fff;
+    margin-right: 3px;
+}
+.video-box .video-list .desc {
+    padding-top: 5px;
+    margin: 6px 6px 10px 6px;
+    height: 38px;
+    line-height: 20px;
+    font-size: 13px;
+    
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
 }
