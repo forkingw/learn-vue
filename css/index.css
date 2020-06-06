@@ -238,3 +238,13 @@ body, html {
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
 }
+
+.footer {
+    margin-top: 40px;
+    font-size: 13px;
+    color: #999;
+    text-align: center;
+}
+.footer p {
+    margin-bottom: 20px;
+}

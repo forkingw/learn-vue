@@ -11,6 +11,8 @@
   <!-- 注意: axios 在 vue 前面引入也是可以的,因为他并没有依赖 vue -->
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
+  <script src="./request.js"></script>
+
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 </head>
 
@@ -173,6 +175,12 @@
         </li>
       </ul>
     </div>
+
+    <!-- 底部区域 -->
+    <div class="footer">
+      <p>哔哩哔哩 沪ICP备13002172号-3</p>
+      <p>信息网络传播视听节目许可证：0910417</p>
+    </div>
   </div>
 
   <script>
@@ -226,24 +234,49 @@
           const toBottomHeight = scrollHeight - offsetHeight - scrollTop;
 
           if (this.videoList.length == this.videoCount) {
-            return;            
+            return;
           }
 
           if (toBottomHeight < 200 && !this.videoGettingData) {
             this.videoGettingData = true;
-            console.log("get")
-            axios.get('https://developer.duyiedu.com/vue/bz/video', {
+            axios.get('video', {
               params: {
                 start: this.videoList.length,
                 offset: 12
               }
             }).then(res => {
-              if (res.status === 200) {
-                this.oldVideList.push(...res.data.data);
+                this.oldVideList.push(...res.data);
                 this.videoGettingData = false;
-              }
             })
           }
+        },
+        getData() {
+          axios.all([
+            axios.get('nav'),
+            axios.get('banner'),
+            axios.get('video', {
+              params: {
+                start: 0,
+                offset: 12
+              }
+            })
+          ]).then(axios.spread((navList, bannerList, video) => {
+            this.initNavList(navList);
+            this.initBannerList(bannerList);
+            this.initVideoList(video);
+          }))
+        },
+        initNavList(navList) {
+          this.navList = navList;
+        },
+        initBannerList(bannerList) {
+          const bannerLaseEle = {...bannerList[0]};
+          bannerLaseEle.id = Math.floor(Math.random() * 10000000);
+          this.bannerList = [...bannerList, bannerLaseEle];
+        },
+        initVideoList(video) {
+          this.oldVideList = video.data;
+          this.videoCount = video.count;
         }
       },
       computed: {
@@ -256,33 +289,7 @@
         }
       },
       created() {
-        axios.get('https://developer.duyiedu.com/vue/bz/nav')
-          .then(res => {
-            if (res.status === 200) {
-              this.navList = res.data.data;
-            }
-          })
-        axios.get('https://developer.duyiedu.com/vue/bz/banner')
-          .then(res => {
-            if (res.status === 200) {
-              const lastEl = {
-                ...res.data.data[0]
-              };
-              lastEl.id = Math.floor(Math.random() * 100000000);
-              this.bannerList = [...res.data.data, lastEl];
-            }
-          })
-        axios.get('https://developer.duyiedu.com/vue/bz/video', {
-          params: {
-            start: 0,
-            offset: 12
-          }
-        }).then(res => {
-          if (res.status === 200) {
-            this.oldVideList = res.data.data;
-            this.videoCount = res.data.count;
-          }
-        })
+        this.getData();
       },
       mounted() {
         this.autoMove();
